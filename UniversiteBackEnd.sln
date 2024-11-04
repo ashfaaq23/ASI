@@ -8,6 +8,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{BB679098-EC76-484A-B9E5-A7FA1DF51CC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversiteDomain", "UniversiteDomain\UniversiteDomain.csproj", "{A4FC12BF-6DD1-4A1F-A106-9A1370029C5F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataProviders", "DataProviders", "{A00F4FEC-4998-4058-9209-79FB3458D893}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,12 @@ Global
 		{69FC92F0-FBF8-4566-9F1D-07FF2133E79E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69FC92F0-FBF8-4566-9F1D-07FF2133E79E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69FC92F0-FBF8-4566-9F1D-07FF2133E79E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4FC12BF-6DD1-4A1F-A106-9A1370029C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4FC12BF-6DD1-4A1F-A106-9A1370029C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4FC12BF-6DD1-4A1F-A106-9A1370029C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4FC12BF-6DD1-4A1F-A106-9A1370029C5F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A4FC12BF-6DD1-4A1F-A106-9A1370029C5F} = {F2FCA814-E0E7-482A-AB36-C796D196BF4E}
 	EndGlobalSection
 EndGlobal
