@@ -14,7 +14,7 @@ public class CreateEtudiantUseCase(IEtudiantRepository etudiantRepository)
     }
     public async Task<Etudiant> ExecuteAsync(Etudiant etudiant)
     {
-        await CheckBusinessRules(etudiant); 
+        await CheckBusinessRules(etudiant);
         Etudiant et = await etudiantRepository.CreateAsync(etudiant);
         etudiantRepository.SaveChangesAsync().Wait();
         return et;
@@ -30,7 +30,7 @@ public class CreateEtudiantUseCase(IEtudiantRepository etudiantRepository)
         List<Etudiant> existe = await etudiantRepository.FindByConditionAsync(e=>e.NumEtud.Equals(etudiant.NumEtud));
 
         // Si un étudiant avec le même numéro étudiant existe déjà, on lève une exception personnalisée
-        if (existe .Any()) throw new DuplicateNumEtudException(etudiant.NumEtud+ " - ce numéro d'étudiant est déjà affecté à un étudiant");
+        if (existe is {Count:>0}) throw new DuplicateNumEtudException(etudiant.NumEtud+ " - ce numéro d'étudiant est déjà affecté à un étudiant");
         
         // Vérification du format du mail
         if (!CheckEmail.IsValidEmail(etudiant.Email)) throw new InvalidEmailException(etudiant.Email + " - Email mal formé");
@@ -42,4 +42,4 @@ public class CreateEtudiantUseCase(IEtudiantRepository etudiantRepository)
         // Le métier définit que les nom doite contenir plus de 3 lettres
         if (etudiant.Nom.Length < 3) throw new InvalidNomEtudiantException(etudiant.Nom +" incorrect - Le nom d'un étudiant doit contenir plus de 3 caractères");
     }
-}   
+}
