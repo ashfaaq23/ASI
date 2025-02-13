@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using UniversiteDomain.DataAdapters;
@@ -6,8 +8,6 @@ using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 using UniversiteDomain.Entities;
 using UniversiteDomain.Exceptions.NoteExceptions;
 using UniversiteDomain.UseCases.NoteUseCases;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace UniversiteDomainUnitTests
 {
@@ -60,7 +60,7 @@ namespace UniversiteDomainUnitTests
                 .ReturnsAsync((Note?)null); // Aucune note existante
 
             _noteRepositoryMock
-                .Setup(repo => repo.AddNoteAsync(It.IsAny<Note>()))
+                .Setup(repo => repo.CreateAsync(It.IsAny<Note>()))
                 .ReturnsAsync((Note note) => note);
 
             // Act
@@ -72,7 +72,7 @@ namespace UniversiteDomainUnitTests
             Assert.That(result.EtudiantId, Is.EqualTo(etudiantId));
             Assert.That(result.UeId, Is.EqualTo(ueId));
 
-            _noteRepositoryMock.Verify(repo => repo.AddNoteAsync(It.IsAny<Note>()), Times.Once);
+            _noteRepositoryMock.Verify(repo => repo.CreateAsync(It.IsAny<Note>()), Times.Once);
         }
 
         // ✅ TEST POUR UNE NOTE HORS DE LA PLAGE [0, 20] ✅

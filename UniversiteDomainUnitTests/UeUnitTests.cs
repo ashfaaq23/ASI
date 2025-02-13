@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using UniversiteDomain.DataAdapters;
@@ -8,8 +10,6 @@ using UniversiteDomain.Exceptions.ParcoursExceptions;
 using UniversiteDomain.Exceptions.UeExceptions;
 using UniversiteDomain.UseCases.ParcoursUseCases.UeDansParcours;
 using UniversiteDomain.UseCases.UeUseCases.Create;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace UniversiteDomainUnitTests
 {

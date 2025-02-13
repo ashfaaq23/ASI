@@ -1,13 +1,13 @@
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Moq;
+using NUnit.Framework;
 using UniversiteDomain.DataAdapters;
 using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 using UniversiteDomain.Entities;
 using UniversiteDomain.UseCases.EtudiantUseCases.Create;
 using UniversiteDomain.Util;
-using NUnit.Framework;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace UniversiteDomainUnitTests
 {

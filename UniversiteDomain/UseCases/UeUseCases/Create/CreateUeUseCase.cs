@@ -1,7 +1,7 @@
 using UniversiteDomain.DataAdapters;
+using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 using UniversiteDomain.Entities;
 using UniversiteDomain.Exceptions.UeExceptions;
-using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 
 namespace UniversiteDomain.UseCases.UeUseCases.Create
 {

@@ -28,7 +28,7 @@ namespace UniversiteDomain.UseCases.NoteUseCases
                 Valeur = valeur
             };
 
-            return await _noteRepository.AddNoteAsync(note);
+            return await _noteRepository.CreateAsync(note);
         }
 
         private async Task CheckBusinessRules(long etudiantId, long ueId, float valeur)
