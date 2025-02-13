@@ -1,7 +1,6 @@
 using UniversiteDomain.Entities;
 
 namespace UniversiteDomain.DataAdapters;
-
 public interface IUeRepository : IRepository<Ue>
 {
     //  Récupérer une UE par son ID avec les parcours associés
