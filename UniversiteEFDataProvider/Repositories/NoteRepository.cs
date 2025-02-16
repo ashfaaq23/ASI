@@ -7,14 +7,6 @@ namespace UniversiteEFDataProvider.Repositories;
 
 public class NoteRepository(UniversiteDbContext context) : Repository<Note>(context), INoteRepository
 {
-    //  Ajouter une note pour un étudiant et une UE
-    public async Task<Note> AddNoteAsync(Note note)
-    {
-        ArgumentNullException.ThrowIfNull(Context.Notes);
-        await Context.Notes.AddAsync(note);
-        await Context.SaveChangesAsync();
-        return note;
-    }
 
     //  Vérifier si un étudiant a déjà une note dans une UE
     public async Task<Note?> GetNoteByEtudiantAndUeAsync(long etudiantId, long ueId)
@@ -52,5 +44,14 @@ public class NoteRepository(UniversiteDbContext context) : Repository<Note>(cont
 
         Context.Notes.Remove(note);
         await Context.SaveChangesAsync();
+    }
+    public async Task<Note> AddNoteAsync(Note note)
+    {
+        if (note == null)
+            throw new ArgumentNullException(nameof(note));
+
+        await Context.Notes.AddAsync(note);
+        await Context.SaveChangesAsync();
+        return note;
     }
 }

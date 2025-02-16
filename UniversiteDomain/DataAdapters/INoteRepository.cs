@@ -12,4 +12,5 @@ public interface INoteRepository : IRepository<Note>
 
     //  Mettre à jour une note existante
     Task UpdateNoteAsync(long etudiantId, long ueId, float nouvelleValeur);
+    Task<Note> AddNoteAsync(Note note);
 }

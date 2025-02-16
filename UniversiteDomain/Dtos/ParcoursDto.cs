@@ -15,6 +15,15 @@ public class ParcoursDto
         this.AnneeFormation = parcours.AnneeFormation;
         return this;
     }
+    public static List<ParcoursDto> ToDtos(List<Parcours> parcours)
+    {
+        return parcours.Select(p => new ParcoursDto
+        {
+            Id = p.Id,
+            NomParcours = p.NomParcours,
+            AnneeFormation = p.AnneeFormation
+        }).ToList();
+    }
     
     public Parcours ToEntity()
     {

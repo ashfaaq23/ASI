@@ -11,4 +11,6 @@ public interface IUeRepository : IRepository<Ue>
 
     //  Ajouter une UE à un parcours
     Task<Ue> AddUeToParcoursAsync(long ueId, long parcoursId);
+    Task<List<Ue>> GetAllAsync();
+    Task<Ue?> GetByIdAsync(long id);
 }

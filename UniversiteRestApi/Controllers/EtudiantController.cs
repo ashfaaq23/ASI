@@ -1,5 +1,5 @@
+
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 using UniversiteDomain.Dtos;
@@ -9,6 +9,7 @@ using UniversiteDomain.UseCases.EtudiantUseCases.Delete;
 using UniversiteDomain.UseCases.EtudiantUseCases.Get;
 using UniversiteDomain.UseCases.SecurityUseCases.Create;
 using UniversiteDomain.UseCases.SecurityUseCases.Get;
+
 using UniversiteEFDataProvider.Entities;
 
 namespace UniversiteRestApi.Controllers
@@ -19,17 +20,38 @@ namespace UniversiteRestApi.Controllers
     {
         // GET: api/<EtudiantController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<List<EtudiantDto>>> GetAsync()
         {
-            return new string[] { "value1", "value2" };
+            string role="";
+            string email="";
+            IUniversiteUser user=null;
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+            
+            GetTousLesEtudiantsUseCase uc = new GetTousLesEtudiantsUseCase(repositoryFactory);
+            if (!uc.IsAuthorized(role)) return Unauthorized();
+            List<Etudiant> etud=null;
+            try
+            {
+                etud = await uc.ExecuteAsync();
+            }
+            catch (Exception e)
+            {
+                return ValidationProblem();
+            }
+            return EtudiantDto.ToDtos(etud);
         }
-        
-        // Définissons une nouvelle route pour ne pas créer de conflit avec le get de base
-// GET api/<EtudiantController>/complet/5
-        [HttpGet("complet/{id}")]
-        public async Task<ActionResult<EtudiantCompletDto>> GetUnEtudiantCompletAsync(long id)
+
+        // GET api/<EtudiantController>/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EtudiantDto>>  GetUnEtudiant(long id)
         {
-            // Identification et authentification
             string role="";
             string email="";
             IUniversiteUser user = null;
@@ -41,9 +63,8 @@ namespace UniversiteRestApi.Controllers
             {
                 return Unauthorized();
             }
-    
-            GetEtudiantCompletUseCase uc = new GetEtudiantCompletUseCase(repositoryFactory);
-            // Autorisation
+            
+            GetEtudiantByIdUseCase uc = new GetEtudiantByIdUseCase(repositoryFactory);
             // On vérifie si l'utilisateur connecté a le droit d'accéder à la ressource
             if (!uc.IsAuthorized(role, user, id)) return Unauthorized();
             Etudiant? etud;
@@ -56,27 +77,45 @@ namespace UniversiteRestApi.Controllers
                 ModelState.AddModelError(nameof(e), e.Message);
                 return ValidationProblem();
             }
+           
+            if (etud == null) return NotFound();
+            
+            return new EtudiantDto().ToDto(etud);
+        }
+
+        // GET api/<EtudiantController>/complet/5
+        [HttpGet("complet/{id}")]
+        public async Task<ActionResult<EtudiantCompletDto>> GetUnEtudiantCompletAsync(long id)
+        {
+            string role="";
+            string email="";
+            IUniversiteUser user = null;
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+            
+            GetEtudiantCompletUseCase uc = new GetEtudiantCompletUseCase(repositoryFactory);
+
+            // On vérifie si l'utilisateur connecté a le droit d'accéder à la ressource
+            if (!uc.IsAuthorized(role, user, id)) return Unauthorized();
+            Etudiant? etud;
+            try
+            {
+                etud = await uc.ExecuteAsync(id);
+            }
+            catch (Exception e)
+            {
+                return ValidationProblem();
+            }
             if (etud == null) return NotFound();
             return new EtudiantCompletDto().ToDto(etud);
         }
 
-        // GET api/<EtudiantController>/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<EtudiantDto>> GetUnEtudiant(long id)
-        {
-            var etudiantRepo = repositoryFactory.EtudiantRepository();
-            var etudiant = await etudiantRepo.GetByIdAsync(id);
-
-            if (etudiant == null)
-            {
-                return NotFound(); // Renvoie une réponse HTTP 404 si l'étudiant n'est pas trouvé
-            }
-
-            return Ok(new EtudiantDto().ToDto(etudiant));
-        }
-
-        
-        // Crée un nouvel étudiant sans parcours
         // POST api/<EtudiantController>
         [HttpPost]
         public async Task<ActionResult<EtudiantDto>> PostAsync([FromBody] EtudiantDto etudiantDto)
@@ -89,9 +128,9 @@ namespace UniversiteRestApi.Controllers
             IUniversiteUser user = null;
             CheckSecu(out role, out email, out user);
             if (!createEtudiantUc.IsAuthorized(role) || !createUserUc.IsAuthorized(role)) return Unauthorized();
-    
+            
             Etudiant etud = etudiantDto.ToEntity();
-    
+            
             try
             {
                 etud = await createEtudiantUc.ExecuteAsync(etud);
@@ -123,41 +162,113 @@ namespace UniversiteRestApi.Controllers
 
         // PUT api/<EtudiantController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult<EtudiantDto>> PutAsync(long id, [FromBody] EtudiantDto etudiantDto)
         {
+            UpdateEtudiantUseCase updateEtudiantUc = new UpdateEtudiantUseCase(repositoryFactory);
+            UpdateUniversiteUserUseCase updateUserUc = new UpdateUniversiteUserUseCase(repositoryFactory);
+
+            if (id != etudiantDto.Id)
+            {
+                return BadRequest();
+            }
+
+            string role = "";
+            string email = "";
+            IUniversiteUser user = null;
+
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+
+            if (!updateEtudiantUc.IsAuthorized(role) || !updateUserUc.IsAuthorized(role))
+                return Unauthorized();
+
+            try
+            {
+                //  Convertir le DTO en entité `Etudiant`
+                Etudiant etudiant = etudiantDto.ToEntity();
+
+                // Récupérer l'utilisateur lié à cet étudiant
+                IUniversiteUser? universiteUser = await repositoryFactory.UniversiteUserRepository().FindByEmailAsync(etudiant.Email);
+
+                if (universiteUser == null)
+                {
+                    return NotFound("Utilisateur universitaire non trouvé.");
+                }
+
+                // Mise à jour des données de l'utilisateur
+                universiteUser.Email = etudiantDto.Email;
+                universiteUser.UserName = etudiantDto.Email;
+
+                //  Exécuter les mises à jour
+                await updateUserUc.ExecuteAsync(universiteUser);
+                await updateEtudiantUc.ExecuteAsync(etudiant);
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(e), e.Message);
+                return ValidationProblem();
+            }
+
+            return NoContent();
         }
+
 
         // DELETE api/<EtudiantController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<Parcours>> DeleteAsync(long id)
         {
+            DeleteEtudiantUseCase etudiantUc = new DeleteEtudiantUseCase(repositoryFactory);
+            DeleteUniversiteUserUseCase userUc = new DeleteUniversiteUserUseCase(repositoryFactory);
+            string role = "";
+            string email = "";
+            IUniversiteUser user = null;
+            try
+            {
+                CheckSecu(out role, out email, out user);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+
+            if (!etudiantUc.IsAuthorized(role) || !userUc.IsAuthorized(role)) return Unauthorized();
+            // On supprime l'étudiant et le user avec l'Id id
+            try
+            {
+                await userUc.ExecuteAsync(id);
+                await etudiantUc.ExecuteAsync(id);
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(e), e.Message);
+                return ValidationProblem();
+            }
+
+            return NoContent();
         }
-        
+
         private void CheckSecu(out string role, out string email, out IUniversiteUser user)
         {
             role = "";
-            // Récupération des informations de connexion dans la requête http entrante
             ClaimsPrincipal claims = HttpContext.User;
-            // Faisons nos tests pour savoir si la personne est bien connectée
-            if (claims.Identity?.IsAuthenticated != true) throw new UnauthorizedAccessException();
-            // Récupérons le email de la personne connectée
             if (claims.FindFirst(ClaimTypes.Email)==null) throw new UnauthorizedAccessException();
             email = claims.FindFirst(ClaimTypes.Email).Value;
             if (email==null) throw new UnauthorizedAccessException();
-            // Vérifions qu'il est bien associé à un utilisateur référencé
+            //user = repositoryFactory.UniversiteUserRepository().FindByEmailAsync(email).Result;
             user = new FindUniversiteUserByEmailUseCase(repositoryFactory).ExecuteAsync(email).Result;
             if (user==null) throw new UnauthorizedAccessException();
-            // Vérifions qu'un rôle a bien été défini
-            if (claims.FindFirst(ClaimTypes.Role)==null) throw new UnauthorizedAccessException();
-            // Récupérons le rôle de l'utilisateur
+            if (claims.Identity?.IsAuthenticated != true) throw new UnauthorizedAccessException();
             var ident = claims.Identities.FirstOrDefault();
             if (ident == null)throw new UnauthorizedAccessException();
+            if (claims.FindFirst(ClaimTypes.Role)==null) throw new UnauthorizedAccessException();
             role = ident.FindFirst(ClaimTypes.Role).Value;
             if (role == null) throw new UnauthorizedAccessException();
-            // Vérifions que le user a bien le role envoyé via http
-            bool isInRole = new IsInRoleUseCase(repositoryFactory).ExecuteAsync(email, role).Result; 
-            if (!isInRole) throw new UnauthorizedAccessException();
-            // Si tout est passé sans renvoyer d'exception, le user est authentifié et conncté
         }
     }
 }

@@ -71,4 +71,23 @@ public class RepositoryFactory : IRepositoryFactory
     {
         await _context.Database.EnsureDeletedAsync();
     }
+    public IEtudiantRepository GetEtudiantRepository()
+    {
+        return new EtudiantRepository(_context);
+    }
+
+    public INoteRepository GetNoteRepository()
+    {
+        return new NoteRepository(_context);
+    }
+
+    public IUeRepository GetUeRepository()
+    {
+        return new UeRepository(_context);
+    }
+
+    public IParcoursRepository GetParcoursRepository()
+    {
+        return new ParcoursRepository(_context);
+    }
 }

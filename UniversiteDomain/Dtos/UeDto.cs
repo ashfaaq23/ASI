@@ -15,7 +15,15 @@ public class UeDto
         this.Intitule = ue.Intitule;
         return this;
     }
-    
+    public static List<UeDto> ToDtos(List<Ue> ues)
+    {
+        return ues.Select(ue => new UeDto
+        {
+            Id = ue.Id,
+            NumeroUe = ue.NumeroUe,
+            Intitule = ue.Intitule
+        }).ToList();
+    }
     public Ue ToEntity()
     {
         return new Ue {Id = this.Id, NumeroUe = this.NumeroUe, Intitule = this.Intitule};

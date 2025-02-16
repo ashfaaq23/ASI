@@ -7,19 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="UseCases\EtudiantUseCases\Update\" />
       <Folder Include="UseCases\NotesUseCases\Delete\" />
       <Folder Include="UseCases\NotesUseCases\Get\" />
-      <Folder Include="UseCases\NotesUseCases\Update\" />
-      <Folder Include="UseCases\ParcoursUseCases\Delete\" />
-      <Folder Include="UseCases\ParcoursUseCases\Get\" />
-      <Folder Include="UseCases\ParcoursUseCases\Update\" />
-      <Folder Include="UseCases\UeUseCases\Delete\" />
-      <Folder Include="UseCases\UeUseCases\Get\" />
-      <Folder Include="UseCases\UeUseCases\Update\" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="33.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">

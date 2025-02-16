@@ -44,5 +44,9 @@ namespace UniversiteDomain.UseCases.UeUseCases.Create
             if (existe.Any())
                 throw new DuplicateNumeroUeException($"L'UE avec le numéro '{ue.NumeroUe}' existe déjà.");
         }
+        public bool IsAuthorized(string role)
+        {
+            return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite);
+        }
     }
 }

@@ -32,4 +32,17 @@ public class EtudiantRepository(UniversiteDbContext context) : Repository<Etudia
         ArgumentNullException.ThrowIfNull(Context.Etudiants);
         return await Context.Etudiants.Include(e => e.NotesObtenues).ThenInclude(n=>n.Ue).FirstOrDefaultAsync(e => e.Id == idEtudiant);
     }
+    
+    public async Task<List<Etudiant>> GetAllAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Context.Etudiants);
+        return await Context.Etudiants.ToListAsync();
+    }
+    public async Task<List<Etudiant>> GetEtudiantsByUeAsync(long ueId)
+    {
+        return await Context.Etudiants
+            .Where(e => e.NotesObtenues.Any(n => n.UeId == ueId)) // Filters students linked to the given UE
+            .ToListAsync();
+    }
+
 }

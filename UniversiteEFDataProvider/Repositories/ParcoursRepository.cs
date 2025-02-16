@@ -112,4 +112,19 @@ public class ParcoursRepository(UniversiteDbContext context) : Repository<Parcou
             .Include(p => p.Inscrits)
             .FirstOrDefaultAsync(p => p.Inscrits!.Any(e => e.Id == etudiantId));
     }
+    
+    // Retrieve all Parcours from the database
+    public async Task<List<Parcours>> GetAllAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Context.Parcours);
+        return await Context.Parcours.ToListAsync();
+    }
+
+// Retrieve a single Parcours by ID
+    public async Task<Parcours?> GetByIdAsync(long id)
+    {
+        ArgumentNullException.ThrowIfNull(Context.Parcours);
+        return await Context.Parcours.FindAsync(id);
+    }
+
 }

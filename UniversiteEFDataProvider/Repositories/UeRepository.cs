@@ -41,4 +41,18 @@ public class UeRepository(UniversiteDbContext context) : Repository<Ue>(context)
 
         return ue;
     }
+    // Retrieve all UEs from the database
+    public async Task<List<Ue>> GetAllAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Context.Ues);
+        return await Context.Ues.ToListAsync();
+    }
+
+// Retrieve a single UE by ID
+    public async Task<Ue?> GetByIdAsync(long id)
+    {
+        ArgumentNullException.ThrowIfNull(Context.Ues);
+        return await Context.Ues.FindAsync(id);
+    }
+
 }

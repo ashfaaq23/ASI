@@ -61,5 +61,10 @@ namespace UniversiteDomain.UseCases.ParcoursUseCases.Create
                     $"Nom '{parcours.NomParcours}' incorrect - Il doit contenir au moins 3 caractères."
                 );
         }
+        public bool IsAuthorized(string role)
+        {
+            return role.Equals(Roles.Responsable) || role.Equals(Roles.Scolarite);
+        }
     }
+    
 }
