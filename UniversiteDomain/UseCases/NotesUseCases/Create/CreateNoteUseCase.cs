@@ -6,12 +6,12 @@ using UniversiteDomain.Exceptions.ParcoursExceptions;
 
 namespace UniversiteDomain.UseCases.NoteUseCases
 {
-    public class AjouterNoteUseCase
+    public class CreateNoteUseCase
     {
         private readonly INoteRepository _noteRepository;
         private readonly IParcoursRepository _parcoursRepository;
 
-        public AjouterNoteUseCase(IRepositoryFactory repositoryFactory)
+        public CreateNoteUseCase(IRepositoryFactory repositoryFactory)
         {
             _noteRepository = repositoryFactory?.NoteRepository() ?? throw new ArgumentNullException(nameof(repositoryFactory));
             _parcoursRepository = repositoryFactory?.ParcoursRepository() ?? throw new ArgumentNullException(nameof(repositoryFactory));

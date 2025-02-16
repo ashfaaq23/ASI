@@ -16,7 +16,7 @@ namespace UniversiteDomainUnitTests
         private Mock<INoteRepository> _noteRepositoryMock;
         private Mock<IParcoursRepository> _parcoursRepositoryMock;
         private Mock<IRepositoryFactory> _repositoryFactoryMock;
-        private AjouterNoteUseCase _ajouterNoteUseCase;
+        private CreateNoteUseCase _createNoteUseCase;
 
         [SetUp]
         public void Setup()
@@ -31,7 +31,7 @@ namespace UniversiteDomainUnitTests
             _repositoryFactoryMock.Setup(f => f.ParcoursRepository()).Returns(_parcoursRepositoryMock.Object);
 
             // Initialisation du use case avec la factory mockée
-            _ajouterNoteUseCase = new AjouterNoteUseCase(_repositoryFactoryMock.Object);
+            _createNoteUseCase = new CreateNoteUseCase(_repositoryFactoryMock.Object);
         }
 
         // ✅ TEST POUR L'AJOUT D'UNE NOTE VALIDE ✅
@@ -64,7 +64,7 @@ namespace UniversiteDomainUnitTests
                 .ReturnsAsync((Note note) => note);
 
             // Act
-            var result = await _ajouterNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur);
+            var result = await _createNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -84,8 +84,8 @@ namespace UniversiteDomainUnitTests
             long ueId = 2;
 
             // Act & Assert (valeurs hors limites)
-            Assert.ThrowsAsync<InvalidNoteException>(async () => await _ajouterNoteUseCase.ExecuteAsync(etudiantId, ueId, -5f));
-            Assert.ThrowsAsync<InvalidNoteException>(async () => await _ajouterNoteUseCase.ExecuteAsync(etudiantId, ueId, 25f));
+            Assert.ThrowsAsync<InvalidNoteException>(async () => await _createNoteUseCase.ExecuteAsync(etudiantId, ueId, -5f));
+            Assert.ThrowsAsync<InvalidNoteException>(async () => await _createNoteUseCase.ExecuteAsync(etudiantId, ueId, 25f));
         }
 
         // ✅ TEST POUR UNE NOTE DÉJÀ EXISTANTE ✅
@@ -104,7 +104,7 @@ namespace UniversiteDomainUnitTests
                 .ReturnsAsync(existingNote); // Simule une note existante
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<DuplicateNoteException>(async () => await _ajouterNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur));
+            var exception = Assert.ThrowsAsync<DuplicateNoteException>(async () => await _createNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur));
             Assert.That(exception.Message, Is.EqualTo($"L'étudiant {etudiantId} a déjà une note dans l'UE {ueId}."));
         }
 
@@ -122,7 +122,7 @@ namespace UniversiteDomainUnitTests
                 .ReturnsAsync((Parcours?)null); // L'étudiant n'a pas de parcours
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<UnauthorizedNoteException>(async () => await _ajouterNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur));
+            var exception = Assert.ThrowsAsync<UnauthorizedNoteException>(async () => await _createNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur));
             Assert.That(exception.Message, Is.EqualTo($"L'étudiant {etudiantId} n'est inscrit dans aucun parcours."));
         }
 
@@ -151,7 +151,7 @@ namespace UniversiteDomainUnitTests
                 .ReturnsAsync(parcours);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<UnauthorizedNoteException>(async () => await _ajouterNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur));
+            var exception = Assert.ThrowsAsync<UnauthorizedNoteException>(async () => await _createNoteUseCase.ExecuteAsync(etudiantId, ueId, valeur));
             Assert.That(exception.Message, Is.EqualTo($"L'étudiant {etudiantId} ne peut pas être noté pour l'UE {ueId} car elle ne fait pas partie de son parcours."));
         }
     }

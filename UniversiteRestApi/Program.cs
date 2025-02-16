@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UniversiteDomain.DataAdapters;
 using UniversiteDomain.DataAdapters.DataAdaptersFactory;
 using UniversiteEFDataProvider.Data;
 using UniversiteEFDataProvider.RepositoryFactories;
 using MySql.EntityFrameworkCore.Extensions;
+using UniversiteDomain.JeuxDeDonnees;
+using UniversiteEFDataProvider.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,17 @@ builder.Services.AddDbContext<UniversiteDbContext>(options =>options.UseMySQL(co
 // La factory est rajoutée dans les services de l'application, toujours prête à être utilisée par injection de dépendances
 builder.Services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
+// Sécurisation
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddCookie(IdentityConstants.ApplicationScheme)
+    .AddBearerToken(IdentityConstants.BearerScheme);
+
+builder.Services.AddIdentityCore<UniversiteUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<UniversiteDbContext>() // Ici, on stocke les users dans la même bd que le reste
+    .AddApiEndpoints();
+
 // Création de tous les services qui sont stockés dans app
 // app contient tous les aobjets de notre application
 var app = builder.Build();
@@ -38,6 +52,11 @@ app.MapControllers();
 // Commentez les deux lignes ci-dessous pour désactiver Swagger (en production par exemple)
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// Sécurisation
+app.UseAuthorization();
+// Ajoute les points d'entrée dans l'API pour s'authentifier, se connecter et se déconnecter
+app.MapIdentityApi<UniversiteUser>();
 
 // Initisation de la base de données
 // A commenter si vous ne voulez pas vider la base à chaque Run!
@@ -55,6 +74,16 @@ using(var scope = app.Services.CreateScope())
     logger.LogInformation("Création de la BD et des tables à partir des entities");
     await context.Database.EnsureCreatedAsync();
 }
-
+// Initisation de la base de données
+    ILogger logger2 = app.Services.GetRequiredService<ILogger<BdBuilder>>();
+    logger2.LogInformation("Chargement des données de test");
+    using(var scope = app.Services.CreateScope())
+{
+    UniversiteDbContext context = scope.ServiceProvider.GetRequiredService<UniversiteDbContext>();
+    IRepositoryFactory repositoryFactory = scope.ServiceProvider.GetRequiredService<IRepositoryFactory>();   
+    // C'est ici que vous changez le jeu de données pour démarrer sur une base vide par exemple
+    BdBuilder seedBD = new BasicBdBuilder(repositoryFactory);
+    await seedBD.BuildUniversiteBdAsync();
+}
 // Exécution de l'application
 app.Run();
