@@ -55,8 +55,8 @@ namespace UniversiteDomain.UseCases.ParcoursUseCases.Create
                     $"Le parcours '{parcours.NomParcours}' existe déjà."
                 );
 
-            // Vérification que le nom du parcours contient au moins 3 caractères
-            if (parcours.NomParcours.Length < 3)
+            // Vérification que le nom du parcours contient au moins 2 caractères
+            if (parcours.NomParcours.Length < 2)
                 throw new InvalidNomParcoursException(
                     $"Nom '{parcours.NomParcours}' incorrect - Il doit contenir au moins 3 caractères."
                 );
